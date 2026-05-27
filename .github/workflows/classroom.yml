@@ -1,0 +1,59 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Java HelloWorld
+      id: java-helloworld
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Java HelloWorld
+        setup-command: javac java/HelloWorld.java
+        command: java -cp java HelloWorld
+        input: ''
+        expected-output: Hello, World!
+        comparison-method: exact
+        timeout: 1
+        max-score: 5
+    - name: Python HelloWorld
+      id: python-helloworld
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Python HelloWorld
+        setup-command: ''
+        command: python3 python/helloworld.py
+        input: ''
+        expected-output: Hello, World!
+        comparison-method: exact
+        timeout: 1
+        max-score: 5
+    - name: JavaScript HelloWorld
+      id: javascript-helloworld
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: JavaScript HelloWorld
+        setup-command: ''
+        command: node javascript/helloworld.js
+        input: ''
+        expected-output: Hello, World!
+        comparison-method: exact
+        timeout: 1
+        max-score: 5
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        JAVA-HELLOWORLD_RESULTS: "${{steps.java-helloworld.outputs.result}}"
+        PYTHON-HELLOWORLD_RESULTS: "${{steps.python-helloworld.outputs.result}}"
+        JAVASCRIPT-HELLOWORLD_RESULTS: "${{steps.javascript-helloworld.outputs.result}}"
+      with:
+        runners: java-helloworld,python-helloworld,javascript-helloworld
